@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenten Rice Bowl - Track Your Almsgiving</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --clay: #C17B5C;
+            --clay-dark: #8B5A3C;
+            --cream: #F5EFE7;
+            --sand: #E8DCC4;
+            --earth: #4A4238;
+            --rice: #F9F5EB;
+            --gold: #D4AF37;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--sand) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--earth);
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: center;
+            color: var(--clay-dark);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--earth);
+            opacity: 0.7;
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .bowl-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .bowl-container:hover {
+            transform: scale(1.05);
+        }
+
+        .bowl-container:active {
+            transform: scale(0.98);
+        }
+
+        .bowl {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bowl-outer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bowl-body {
+            fill: var(--clay);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+        }
+
+        .bowl-rim {
+            fill: var(--clay-dark);
+        }
+
+        .rice-fill {
+            fill: var(--rice);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom;
+        }
+
+        .rice-grains {
+            fill: var(--cream);
+            opacity: 0.6;
+        }
+
+        .amount-display {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .amount {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--clay-dark);
+            line-height: 1;
+        }
+
+        .currency {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+
+        .label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--earth);
+            opacity: 0.6;
+            margin-top: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--clay);
+            background: white;
+            color: var(--clay-dark);
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: var(--clay);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(193, 123, 92, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--clay);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--clay-dark);
+        }
+
+        .increment-selector {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .increment-btn {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--clay);
+            background: white;
+            color: var(--clay-dark);
+            font-family: 'Lora', serif;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .increment-btn.active {
+            background: var(--clay);
+            color: white;
+            box-shadow: 0 3px 10px rgba(193, 123, 92, 0.3);
+        }
+
+        .increment-btn:hover {
+            border-color: var(--clay-dark);
+        }
+
+        .scripture {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(193, 123, 92, 0.1) 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--gold);
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .scripture.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scripture-text {
+            font-style: italic;
+            line-height: 1.6;
+            color: var(--earth);
+            margin-bottom: 0.8rem;
+        }
+
+        .scripture-ref {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--clay-dark);
+            font-weight: 500;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.5);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            animation: ripple-animation 1s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            from {
+                transform: scale(0);
+                opacity: 1;
+            }
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .celebration {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            animation: float-up 2s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            from {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .bowl-container {
+                width: 240px;
+                height: 240px;
+            }
+
+            .amount {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lenten Rice Bowl</h1>
+        <p class="subtitle">Track Your Almsgiving Journey</p>
+
+        <div class="bowl-container" id="bowl" onclick="addDonation()">
+            <svg class="bowl-outer" viewBox="0 0 200 200">
+                <path class="bowl-body" d="M 40 80 Q 40 150 100 170 Q 160 150 160 80 L 150 80 Q 150 140 100 155 Q 50 140 50 80 Z"/>
+                <ellipse class="bowl-rim" cx="100" cy="80" rx="60" ry="12"/>
+                <g class="rice-container">
+                    <path class="rice-fill" id="riceFill" d="M 50 80 Q 50 80 100 80 Q 150 80 150 80 L 150 80 Q 150 80 100 80 Q 50 80 50 80 Z"/>
+                </g>
+                <g class="rice-grains" id="riceGrains" opacity="0">
+                    <circle cx="70" cy="85" r="2"/>
+                    <circle cx="90" cy="90" r="2"/>
+                    <circle cx="110" cy="88" r="2"/>
+                    <circle cx="130" cy="92" r="2"/>
+                    <circle cx="80" cy="95" r="2"/>
+                    <circle cx="120" cy="95" r="2"/>
+                </g>
+            </svg>
+        </div>
+
+        <div class="amount-display">
+            <div class="amount">
+                <span class="currency">$</span><span id="totalAmount">0.00</span>
+            </div>
+            <div class="label">Total Given</div>
+        </div>
+
+        <div class="increment-selector">
+            <button class="increment-btn" onclick="setIncrement(0.25)">$0.25</button>
+            <button class="increment-btn active" onclick="setIncrement(1)">$1.00</button>
+            <button class="increment-btn" onclick="setIncrement(5)">$5.00</button>
+            <button class="increment-btn" onclick="setIncrement(10)">$10.00</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="addDonation()">Add to Bowl</button>
+            <button class="btn" onclick="resetBowl()">Reset</button>
+        </div>
+
+        <div class="scripture" id="scripture">
+            <p class="scripture-text" id="scriptureText"></p>
+            <p class="scripture-ref" id="scriptureRef"></p>
+        </div>
+    </div>
+
+    <script>
+        const scriptures = [
+            {
+                text: "Give, and it will be given to you. A good measure, pressed down, shaken together and running over, will be poured into your lap. For with the measure you use, it will be measured to you.",
+                ref: "Luke 6:38"
+            },
+            {
+                text: "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.",
+                ref: "2 Corinthians 9:7"
+            },
+            {
+                text: "Whoever is kind to the poor lends to the Lord, and he will reward them for what they have done.",
+                ref: "Proverbs 19:17"
+            },
+            {
+                text: "The King will reply, 'Truly I tell you, whatever you did for one of the least of these brothers and sisters of mine, you did for me.'",
+                ref: "Matthew 25:40"
+            },
+            {
+                text: "Remember this: Whoever sows sparingly will also reap sparingly, and whoever sows generously will also reap generously.",
+                ref: "2 Corinthians 9:6"
+            },
+            {
+                text: "If anyone has material possessions and sees a brother or sister in need but has no pity on them, how can the love of God be in that person?",
+                ref: "1 John 3:17"
+            },
+            {
+                text: "Give to everyone who asks you, and if anyone takes what belongs to you, do not demand it back.",
+                ref: "Luke 6:30"
+            },
+            {
+                text: "But when you give to the needy, do not let your left hand know what your right hand is doing, so that your giving may be in secret.",
+                ref: "Matthew 6:3-4"
+            }
+        ];
+
+        let total = 0;
+        let currentIncrement = 1;
+        let currentScriptureIndex = 0;
+
+        window.onload = function() {
+            const saved = localStorage.getItem('lentenBowl');
+            if (saved) {
+                const data = JSON.parse(saved);
+                total = data.total || 0;
+                currentIncrement = data.increment || 1;
+                currentScriptureIndex = data.scriptureIndex || 0;
+                updateDisplay();
+                setActiveIncrement();
+            }
+        };
+
+        function setIncrement(amount) {
+            currentIncrement = amount;
+            setActiveIncrement();
+            saveData();
+        }
+
+        function setActiveIncrement() {
+            document.querySelectorAll('.increment-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const btns = document.querySelectorAll('.increment-btn');
+            const amounts = [0.25, 1, 5, 10];
+            const index = amounts.indexOf(currentIncrement);
+            if (index >= 0 && btns[index]) {
+                btns[index].classList.add('active');
+            }
+        }
+
+        function addDonation() {
+            total += currentIncrement;
+            updateDisplay();
+            showScripture();
+            createRipple(event);
+            createCelebration();
+            saveData();
+        }
+
+        function updateDisplay() {
+            document.getElementById('totalAmount').textContent = total.toFixed(2);
+            updateBowlFill();
+        }
+
+        function updateBowlFill() {
+            const fillCycle = 50;
+            const percentage = Math.min(((total % fillCycle) / fillCycle) * 100, 100);
+            
+            const baseY = 80;
+            const maxFill = 145;
+            const fillHeight = baseY + (maxFill - baseY) * (percentage / 100);
+            
+            const riceFill = document.getElementById('riceFill');
+            const riceGrains = document.getElementById('riceGrains');
+            
+            riceFill.setAttribute('d', `
+                M 50 ${baseY} 
+                Q 50 ${fillHeight} 100 ${fillHeight + 5} 
+                Q 150 ${fillHeight} 150 ${baseY} 
+                L 150 ${baseY} 
+                Q 150 ${baseY + 5} 100 ${baseY + 5} 
+                Q 50 ${baseY + 5} 50 ${baseY} Z
+            `);
+            
+            if (percentage > 5) {
+                riceGrains.setAttribute('opacity', '1');
+                const grainY = baseY + (fillHeight - baseY) / 2;
+                const circles = riceGrains.querySelectorAll('circle');
+                circles.forEach((circle, i) => {
+                    const baseX = [70, 90, 110, 130, 80, 120][i];
+                    circle.setAttribute('cy', grainY + (i % 3) * 5);
+                });
+            } else {
+                riceGrains.setAttribute('opacity', '0');
+            }
+        }
+
+        function showScripture() {
+            const scripture = scriptures[currentScriptureIndex];
+            document.getElementById('scriptureText').textContent = scripture.text;
+            document.getElementById('scriptureRef').textContent = scripture.ref;
+            document.getElementById('scripture').classList.add('show');
+            
+            currentScriptureIndex = (currentScriptureIndex + 1) % scriptures.length;
+        }
+
+        function createRipple(e) {
+            if (!e) return;
+            const bowl = document.getElementById('bowl');
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            
+            const rect = bowl.getBoundingClientRect();
+            const x = e.clientX - rect.left - 20;
+            const y = e.clientY - rect.top - 20;
+            
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            bowl.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1000);
+        }
+
+        function createCelebration() {
+            const emojis = ['✨', '🙏', '❤️', '🕊️', '💝'];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            celebration.style.left = (Math.random() * 80 + 10) + '%';
+            celebration.style.top = '50%';
+            
+            document.body.appendChild(celebration);
+            setTimeout(() => celebration.remove(), 2000);
+        }
+
+        function resetBowl() {
+            if (confirm('Are you sure you want to reset your rice bowl? This will clear all your recorded giving.')) {
+                total = 0;
+                currentScriptureIndex = 0;
+                updateDisplay();
+                document.getElementById('scripture').classList.remove('show');
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('lentenBowl', JSON.stringify({
+                total: total,
+                increment: currentIncrement,
+                scriptureIndex: currentScriptureIndex
+            }));
+        }
+    </script>
+</body>
+</html>
